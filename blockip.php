@@ -5,10 +5,21 @@ namespace grewi;
 class blockip
 {
     protected string $currentIp;
-    protected string $pathFiles = __DIR__ . '/files';
+    protected string $pathFiles;
     protected array $ipList;
 
-    //Автоматически определить ip запроса
+    public function __construct()
+    {
+        $this->pathFiles = __DIR__ . '/files';
+        $this->ipList = [];
+        $this->currentIp();
+        $this->setFiles();
+    }
+
+    /**
+     * Автоматически определить ip запроса
+     * @return blockip
+     */
     public function currentIp(): static
     {
         if (filter_var(@$_SERVER['HTTP_CLIENT_IP'], FILTER_VALIDATE_IP)) {
@@ -22,45 +33,66 @@ class blockip
         return $this;
     }
 
-    //Вкручную указать ip запроса
+    /**
+     * Вкручную указать ip запроса
+     * @param string $ip
+     * @return blockip
+     */
     public function setIp(string $ip): static
     {
         $this->currentIp = $ip;
         return $this;
     }
 
-    //Загрузить список ip текстом с разделением через запятую
+    /**
+     * Загрузить список ip текстом с разделением через запятую
+     * @param string $txt
+     * @return blockip
+     */
     public function setIpList(string $txt): static
     {
         $l = explode(',', $txt);
-        foreach($l as &$i){
+        foreach ($l as &$i) {
             $i = trim($i);
         }
         $this->ipList = array_merge($this->ipList, $l);
         return $this;
     }
 
-    //Загрузить из файлов в указанной директории
-    private function setFiles():static
+    /**
+     * Загрузить из файлов в указанной директории
+     * @return blockip
+     */
+    private function setFiles(): static
     {
         $d = scandir($this->pathFiles);
-        foreach($d as $i){
-            if($i == '.' || $i == '..'){
+        foreach ($d as $i) {
+            if ($i == '.' || $i == '..') {
                 continue;
             }
-            $this->setIpList(file_get_contents( $d . '/' . $i));
+            $this->setIpList(file_get_contents($this->pathFiles . '/' . $i));
         }
         return $this;
     }
 
-    //Указать свою директорию с файлами txt
+
+    /**
+     * Указать свою директорию с файлами txt
+     * @param string $path
+     * @return void
+     */
     public function setDirFiles(string $path)
     {
         $this->pathFiles = $path;
     }
 
 
-    // функция проверки ip
+    /**
+     * Функция проверки ip
+     * @param string $addr
+     * @param array $cidrs
+     * @return bool
+     */
     private function test(string $addr, array $cidrs): bool
     {
         foreach ($cidrs as $cidr) {
@@ -95,19 +127,16 @@ class blockip
         return false;
     }
 
+    /**
+     * Поиск ip в списке 
+     * @return bool
+     */
     public function start(): bool
     {
         $this->setFiles();
-        if(!$this->currentIp){
-            $this->currentIp();
+        if ($this->test($this->currentIp, $this->ipList)) {
+            return true;
         }
-        $f = false;
-        //проверяем текущий айпишник со списком
-        foreach ($this->ipList as $ip) {
-            if ($this->test($this->currentIp, $ip))
-                $f = true;
-        }
-
-        return $f;
+        return false;
     }
 }
