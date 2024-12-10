@@ -41,7 +41,7 @@ class blockip
     }
 
     //Загрузить из файлов в указанной директории
-    public function setFiles():static
+    private function setFiles():static
     {
         $d = scandir($this->pathFiles);
         foreach($d as $i){
@@ -97,8 +97,11 @@ class blockip
 
     public function start(): bool
     {
+        $this->setFiles();
+        if(!$this->currentIp){
+            $this->currentIp();
+        }
         $f = false;
-
         //проверяем текущий айпишник со списком
         foreach ($this->ipList as $ip) {
             if ($this->test($this->currentIp, $ip))
