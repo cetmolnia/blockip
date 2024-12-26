@@ -139,4 +139,12 @@ class blockip
         }
         return false;
     }
+
+    public function control()
+    {
+        if($this->start()){
+            http_response_code(403);
+            exit('Запрос заблокирован! <a href="/contacts">Если произошла ошибка обратитесь к администратору ресурса</a>');
+        }
+    }
 }
