@@ -49,7 +49,7 @@ class blockip
      * @param string $txt
      * @return blockip
      */
-    public function setIpList(string $txt): static
+    public function setIpList(string $txt)
     {
         $l = explode(',', $txt);
         foreach ($l as &$i) {
@@ -63,7 +63,7 @@ class blockip
      * Загрузить из файлов в указанной директории
      * @return blockip
      */
-    private function setFiles(): static
+    private function setFiles()
     {
         $d = scandir($this->pathFiles);
         foreach ($d as $i) {
