@@ -20,7 +20,7 @@ class blockip
      * Автоматически определить ip запроса
      * @return blockip
      */
-    public function currentIp(): static
+    public function currentIp()
     {
         if (filter_var(@$_SERVER['HTTP_CLIENT_IP'], FILTER_VALIDATE_IP)) {
             $ip = @$_SERVER['HTTP_CLIENT_IP'];
@@ -38,7 +38,7 @@ class blockip
      * @param string $ip
      * @return blockip
      */
-    public function setIp(string $ip): static
+    public function setIp(string $ip)
     {
         $this->currentIp = $ip;
         return $this;
